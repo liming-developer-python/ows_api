@@ -10,7 +10,7 @@ export default () => {
   const [trades, setTrades] = useState()
   const [withdrawls, setWithdrawls] = useState()
   const [deposits, setDeposits] = useState()
-  const [channel, setChannel] = useState()
+  const [channel, setChannel] = useState("")
 
   const [formData, setFormData] = useState()
 
@@ -77,18 +77,6 @@ export default () => {
         if (path.includes('deposit/send')) {
           setDeposits(res.data)
         }
-        if (path.includes('stream/subscribe')) {
-          setChannel(res.data)
-        }
-        else if (path.includes('stream/unsubscribe')) {
-          setChannel(res.data)
-        }
-        else if (path.includes('stream/close')) {
-          setChannel(res.data)
-        }
-        else if (path.includes('stream')) {
-          setChannel(res.data)
-        }
       } else {
         console.log("ERR xSignature GET")
       }
@@ -106,17 +94,36 @@ export default () => {
     else if (btn_id == "exposure") {
       callAPISignature('/v1/exposure')
     }
-    else if (btn_id == "price_y") {
-      callAPISignature('/v1/stream')
+  }
+
+  const streamData = (e) => {
+    e.preventDefault()
+    var btn_id = e.currentTarget.id;
+    let getResults = () => {
+      axios({
+        method: "get",
+        url: 'https://api.bitpreco.com/btc-brl/ticker'
+      }).then((res) => {
+        if (res) {
+          console.log(res.data)
+          setChannel(res.data.last)
+        } else {
+
+        }
+      }).catch((err) => {
+        // handle err
+        console.log(err)
+      })
     }
-    else if (btn_id == "price_subscribe") {
-      callAPISignature('/v1/stream/subscribe')
+    
+    if (btn_id == "price_y") {
+      getResults();
     }
-    else if (btn_id == "price_unsubscribe") {
-      callAPISignature('/v1/stream/unsubscribe')
+    else if (btn_id == "price_reload") {
+      getResults();
     }
     else if (btn_id == "price_close") {
-      callAPISignature('/v1/stream/close')
+      setChannel('Stopped');
     }
   }
 
@@ -458,17 +465,18 @@ export default () => {
             <Card.Body>
               <Card.Title>
                 <Row>
+                  <Col xs={1}></Col>
                   <Col xs={3}>
-                    <Button variant="primary" id="price_y" onClick={handleClick} >GET Price Y</Button>
+                    <Button variant="primary" id="price_y" onClick={streamData} >Start</Button>
                   </Col>
-                  <Col xs={3}>
-                    <Button variant="primary" id="price_subscribe" onClick={handleClick} >Subscribe</Button>
+                  <Col xs={4}>
+                    <span id='price'>{channel}</span>
                   </Col>
-                  <Col xs={3}>
-                    <Button variant="primary" id="price_unsubscribe" onClick={handleClick} >Unsubscribe</Button>
+                  <Col xs={2}>
+                    <Button variant="primary" id="price_reload" onClick={streamData} >Reload</Button>
                   </Col>
-                  <Col xs={3}>
-                    <Button variant="primary" id="price_close" onClick={handleClick} >Close</Button>
+                  <Col xs={2}>
+                    <Button variant="primary" id="price_close" onClick={streamData} >Stop</Button>
                   </Col>
                 </Row>
               </Card.Title>
