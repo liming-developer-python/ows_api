@@ -10,6 +10,7 @@ export default () => {
   const [trades, setTrades] = useState()
   const [withdrawls, setWithdrawls] = useState()
   const [deposits, setDeposits] = useState()
+  const [channel, setChannel] = useState()
 
   const [formData, setFormData] = useState()
 
@@ -76,6 +77,18 @@ export default () => {
         if (path.includes('deposit/send')) {
           setDeposits(res.data)
         }
+        if (path.includes('stream/subscribe')) {
+          setChannel(res.data)
+        }
+        else if (path.includes('stream/unsubscribe')) {
+          setChannel(res.data)
+        }
+        else if (path.includes('stream/close')) {
+          setChannel(res.data)
+        }
+        else if (path.includes('stream')) {
+          setChannel(res.data)
+        }
       } else {
         console.log("ERR xSignature GET")
       }
@@ -90,8 +103,20 @@ export default () => {
     if (btn_id == "balance") {
       callAPISignature('/v1/balance')
     }
-    if (btn_id == "exposure") {
+    else if (btn_id == "exposure") {
       callAPISignature('/v1/exposure')
+    }
+    else if (btn_id == "price_y") {
+      callAPISignature('/v1/stream')
+    }
+    else if (btn_id == "price_subscribe") {
+      callAPISignature('/v1/stream/subscribe')
+    }
+    else if (btn_id == "price_unsubscribe") {
+      callAPISignature('/v1/stream/unsubscribe')
+    }
+    else if (btn_id == "price_close") {
+      callAPISignature('/v1/stream/close')
     }
   }
 
@@ -101,21 +126,20 @@ export default () => {
     var form_id = e.currentTarget.id
     
     if (form_id == "quote") {
-      if (quoteSide != 'buy') {
+      if (Number(quoteSize) == 0) {
         info = {
           'trading': quoteTrading,
           'settlement': quoteSettlement,
-          'side': quoteSide,
-          'size': Number(quoteSize)
+          'side': quoteSide.toLowerCase(),
+          'amount': Number(quoteAmount)
         }
       }
-      else {
+      else if (Number(quoteAmount) == 0) {
         info = {
           'trading': quoteTrading,
           'settlement': quoteSettlement,
-          'side': quoteSide,
-          'size': Number(quoteSize),
-          'amount': Number(quoteAmount)
+          'side': quoteSide.toLowerCase(),
+          'size': Number(quoteSize)
         }
       }
   
@@ -123,7 +147,7 @@ export default () => {
       callAPISignature('/v1/quote')
     }
 
-    if (form_id == "trade") {
+    else if (form_id == "trade") {
       info = {
         'quoteID': tradeQuoteID,
         'size': Number(tradeSize)
@@ -133,7 +157,7 @@ export default () => {
       callAPISignature('/v1/trade')
     }
 
-    if (form_id == "withdrawl") {
+    else if (form_id == "withdrawl") {
       info = {
         'currency': withdrawlCurrency,
         'address_id': withdrawlAddressID,
@@ -144,7 +168,7 @@ export default () => {
       callAPISignature('/v1/withdrawl/request')
     }
 
-    if (form_id == "sendDeposit") {
+    else if (form_id == "sendDeposit") {
       info = {
         'currency': sendDepositCurrency,
         'address_id': sendDepositAddressID,
@@ -160,9 +184,12 @@ export default () => {
   return (
     <div >
 
-      <Row>
+      <Row className='mt-4'>
         <Col lg={6}>
           <Card>
+            <Card.Header className='bg-success text-white'>
+              GET Balance
+            </Card.Header>
             <Card.Body>
               <Card.Title>
                 <Button variant="primary" id="balance" onClick={handleClick}>Balance</Button>
@@ -185,6 +212,9 @@ export default () => {
 
         <Col lg={6}>
           <Card >
+            <Card.Header className='bg-success text-white'>
+              GET Exposure
+            </Card.Header>
             <Card.Body>
               <Card.Title>
                 <Button variant="primary" id="exposure" onClick={handleClick} >Exposure</Button>
@@ -210,9 +240,12 @@ export default () => {
         </Col>
       </Row>
 
-      <Row>
+      <Row className='mt-4'>
         <Col lg={6} >
           <Card >
+            <Card.Header className='bg-success text-white'>
+              POST Quote Request
+            </Card.Header>
             <Card.Body>
               <Card.Title>
                 <Form onSubmit={onSubmit} id="quote">
@@ -274,6 +307,9 @@ export default () => {
 
         <Col lg={6}>
           <Card >
+            <Card.Header className='bg-success text-white'>
+              POST Trade
+            </Card.Header>
             <Card.Body>
               <Card.Title>
                 <Form onSubmit={onSubmit} id="trade">
@@ -313,9 +349,12 @@ export default () => {
         </Col>
       </Row>
 
-      <Row>
+      <Row className='mt-4'>
         <Col lg={6} >
           <Card >
+            <Card.Header className='bg-success text-white'>
+              POST Withdrawl
+            </Card.Header>
             <Card.Body>
               <Card.Title>
                 <Form onSubmit={onSubmit} id="withdrawl">
@@ -358,6 +397,9 @@ export default () => {
 
         <Col lg={6}>
           <Card >
+            <Card.Header className='bg-success text-white'>
+              POST Send Deposit
+            </Card.Header>
             <Card.Body>
               <Card.Title>
                 <Form onSubmit={onSubmit} id="sendDeposit">
@@ -400,6 +442,40 @@ export default () => {
                 deposits !== undefined ?
                   <ul>
                     <li>batch_id: {deposits.batch_id}</li>
+                  </ul> : ''
+                }
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row className='mt-4'>
+        <Col lg={6} >
+          <Card >
+            <Card.Header className='bg-success text-white'>
+              Price Channel
+            </Card.Header>
+            <Card.Body>
+              <Card.Title>
+                <Row>
+                  <Col xs={3}>
+                    <Button variant="primary" id="price_y" onClick={handleClick} >GET Price Y</Button>
+                  </Col>
+                  <Col xs={3}>
+                    <Button variant="primary" id="price_subscribe" onClick={handleClick} >Subscribe</Button>
+                  </Col>
+                  <Col xs={3}>
+                    <Button variant="primary" id="price_unsubscribe" onClick={handleClick} >Unsubscribe</Button>
+                  </Col>
+                  <Col xs={3}>
+                    <Button variant="primary" id="price_close" onClick={handleClick} >Close</Button>
+                  </Col>
+                </Row>
+              </Card.Title>
+              { 
+                withdrawls !== undefined ?
+                  <ul>
+                    <li>batch_id: {withdrawls.batch_id}</li>
                   </ul> : ''
                 }
             </Card.Body>

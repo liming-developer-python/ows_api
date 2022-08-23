@@ -11,8 +11,8 @@ app.use(bodyParser.json()); // support json encoded bodies
 const apiKey = "4fac5cda-dc49-47a1-a796-75d9c2e9e7f9"
 const apiSecret = "ayyzzGnt8xF373UaUBqSJiYDOppyA-HPc6HlNz6-ANUdomFssmrAPJjto0IX3LRijF5GGOvgXQz2GjDXuTbp4A=="
 
-function signRequest(nonce, path, body = '') {
-    return crypto
+function signRequest(nonce, path, body) {
+  return crypto
       .createHmac("sha512", apiSecret)
       .update(apiKey)
       .update(nonce)
@@ -39,12 +39,10 @@ app.post("/signature", (req, res) => {
     var nonce = req.body.nonce
     var formData = req.body.form_data !== undefined ? req.body.form_data : ''
     var req_url = '', method = '', body = '', sign_path = path
-    var balances = [], exposures = [], quotes = [], trades = [], withdrawls = [], deposits = []
+    var balances = [], exposures = [], quotes = [], trades = [], withdrawls = [], deposits = [], channel = []
     if (formData !== '') {
       body = JSON.stringify(formData).toString()
     }
-
-    x_signature = signRequest(nonce, sign_path, body)
     
     if (path.includes('balance')) {
       method = "get"
@@ -70,6 +68,27 @@ app.post("/signature", (req, res) => {
       method = "post"
       req_url = 'https://gateway-sandbox.oneworldservices.com/v1/deposit/send'
     }
+    if (path.includes('stream/subscribe')) {
+      method = "get"
+      req_url = 'https://gateway-sandbox.oneworldservices.com/v1/stream'
+    }
+    else if (path.includes('stream/unsubscribe')) {
+      method = "get"
+      req_url = 'https://gateway-sandbox.oneworldservices.com/v1/stream'
+    }
+    else if (path.includes('stream/close')) {
+      method = "get"
+      req_url = 'https://gateway-sandbox.oneworldservices.com/v1/stream'
+    }
+    else if (path.includes('stream')) {
+      method = "get"
+      req_url = 'https://gateway-sandbox.oneworldservices.com/v1/stream'
+      body = '{"event":"auth"}'
+      sign_path = '/v1/stream'
+      formData = {'event' : 'auth'}
+    }
+
+    x_signature = signRequest(nonce, sign_path, body)
 
     console.log("--------path--------")
     console.log(path)
@@ -96,7 +115,7 @@ app.post("/signature", (req, res) => {
       console.log(req_url)
       axios({
         method: method,
-        data: formData !== undefined ? formData : '',
+        data: formData,
         url: req_url,
         headers: headerPayload
       }).then((res) => {
@@ -120,6 +139,18 @@ app.post("/signature", (req, res) => {
           if (path.includes('deposit/send')) {
             deposits = res.data
           }
+          if (path.includes('stream/subscribe')) {
+            channel = res.data
+          }
+          else if (path.includes('stream/unsubscribe')) {
+            channel = res.data
+          }
+          else if (path.includes('stream/close')) {
+            channel = res.data
+          }
+          else if (path.includes('stream')) {
+            channel = res.data
+          }
           
         } else {
 
@@ -132,7 +163,7 @@ app.post("/signature", (req, res) => {
     getResults()
     
     async function respond() {
-      await delay(1000)
+      await delay(2000)
       if (path.includes('balance')) {
         res.send(JSON.stringify(balances))
       }
@@ -150,6 +181,18 @@ app.post("/signature", (req, res) => {
       }
       if (path.includes('deposit/send')) {
         res.send(JSON.stringify(deposits))
+      }
+      if (path.includes('stream/subscribe')) {
+        res.send(JSON.stringify(channel))
+      }
+      else if (path.includes('stream/unsubscribe')) {
+        res.send(JSON.stringify(channel))
+      }
+      else if (path.includes('stream/close')) {
+        res.send(JSON.stringify(channel))
+      }
+      else if (path.includes('stream')) {
+        res.send(JSON.stringify(channel))
       }
     }
     respond()
