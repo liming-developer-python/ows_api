@@ -90,17 +90,6 @@ app.post("/signature", (req, res) => {
 
     x_signature = signRequest(nonce, sign_path, body)
 
-    console.log("--------path--------")
-    console.log(path)
-    console.log("---------body-------")
-    console.log(body)
-    console.log("---------method-------")
-    console.log(method)
-    console.log("--------x_signature--------")
-    console.log(x_signature)
-    console.log("--------nonce--------")
-    console.log(nonce)
-
     let getResults = () => {
       const headerPayload = {
         "X-API-Key": apiKey,
@@ -109,10 +98,6 @@ app.post("/signature", (req, res) => {
         "Access-Control-Allow-Origin": "*",
         "Content-type": "Application/json",
       }
-      console.log("--------formData--------")
-      console.log(formData)
-      console.log("-------req_url---------")
-      console.log(req_url)
       axios({
         method: method,
         data: formData,

@@ -99,6 +99,8 @@ export default () => {
   const streamData = (e) => {
     e.preventDefault()
     var btn_id = e.currentTarget.id;
+    console.log('current URL 👉️', window.location.href);
+    console.log('current Pathname 👉️', window.location.pathname);
     let getResults = () => {
       axios({
         method: "get",
@@ -106,7 +108,7 @@ export default () => {
       }).then((res) => {
         if (res) {
           console.log(res.data)
-          setChannel(res.data.last)
+          setChannel(res.data.last * 1.01)
         } else {
 
         }
@@ -477,6 +479,18 @@ export default () => {
                   </Col>
                   <Col xs={2}>
                     <Button variant="primary" id="price_close" onClick={streamData} >Stop</Button>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col xs={9}>
+                    <Form.Group id="transaction_id" className="mb-3">
+                      <Form.Label></Form.Label>
+                      <Form.Control type="text" value={window.location.href} disabled />
+                      <Button variant="primary" id="price_close" onClick={streamData} >Call</Button>
+                    </Form.Group>
+                  </Col>
+                  <Col xs={2}>
+                    
                   </Col>
                 </Row>
               </Card.Title>
