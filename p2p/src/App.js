@@ -32,6 +32,10 @@ export default () => {
   const [sendDepositAddressID, setSendDepositAddressID] = useState("")
   const [sendDepositTransactionID, setSendDepositTransactionID] = useState("")
 
+  const [apiPrice, setAPIPrice] = useState("")
+  const [apiVolume, setAPIVolume] = useState("")
+  const [apiAmount, setAPIAmount] = useState("")
+
   function getNonce() {
     var nonce = Math.floor(
       Date.now() / 1000
@@ -99,8 +103,6 @@ export default () => {
   const streamData = (e) => {
     e.preventDefault()
     var btn_id = e.currentTarget.id;
-    console.log('current URL 👉️', window.location.href);
-    console.log('current Pathname 👉️', window.location.pathname);
     let getResults = () => {
       axios({
         method: "get",
@@ -127,6 +129,40 @@ export default () => {
     else if (btn_id == "price_close") {
       setChannel('Stopped');
     }
+  }
+
+  const postAPI = (e) => {
+    e.preventDefault()
+    var FormData = require('form-data');
+    var data = new FormData();
+    var keyAPI = '2NHd0JMUUFDQTNNVEwwWlVuRUtoVExaLyt5Wmx2OWZTMnZUVA'
+    var signature = 'Mjk5Mzk5OTIyOAtrDtKNxZoXKwANjNHK0ZFVkY1UWVCaCtRQXYvWkIxQnp4VFBTd'
+    data.append('cmd', 'buy');
+    data.append('auth_token', keyAPI + signature);
+    data.append('market', 'BTC-BRL');
+    data.append('price', apiPrice);
+    data.append('volume', apiVolume);
+    data.append('amount', apiAmount);
+    data.append('limited', false);
+    let getResults = () => {
+      axios({
+        method: "post",
+        url: 'https://api.bitpreco.com/trading',
+        data: data
+      }).then((res) => {
+        if (res) {
+          console.log(res.data)
+        } else {
+
+        }
+      }).catch((err) => {
+        // handle err
+        console.log(err)
+      })
+    }
+
+    console.log("TEST API TRADE")
+    getResults()
   }
 
   const onSubmit = (e) => {
@@ -485,14 +521,33 @@ export default () => {
                   <Col xs={9}>
                     <Form.Group id="transaction_id" className="mb-3">
                       <Form.Label></Form.Label>
-                      <Form.Control type="text" value={window.location.href} disabled />
-                      <Button variant="primary" id="price_close" onClick={streamData} >Call</Button>
+                      <Form.Control type="text" value={window.location.href + 'api/trade'} disabled />
                     </Form.Group>
                   </Col>
-                  <Col xs={2}>
-                    
+                </Row>
+                <Row>
+                  <Col xs={6}>
+                    <Form.Group id="price" className="mb-3">
+                      <Form.Label>Price</Form.Label>
+                      <Form.Control required type="text" placeholder="Enter the price" value={apiPrice} onChange={(e) => { setAPIPrice(e.target.value) }} />
+                    </Form.Group>
+                  </Col>
+                  <Col xs={6}>
+                    <Form.Group id="volume" className="mb-3">
+                      <Form.Label>Volume</Form.Label>
+                      <Form.Control required type="text" placeholder="Enter the volume" value={apiVolume} onChange={(e) => { setAPIVolume(e.target.value) }} />
+                    </Form.Group>
                   </Col>
                 </Row>
+                <Row>
+                  <Col xs={6}>
+                    <Form.Group id="amount" className="mb-3">
+                      <Form.Label>Amount</Form.Label>
+                      <Form.Control required type="text" placeholder="Enter the amount" value={apiAmount} onChange={(e) => { setAPIAmount(e.target.value) }} />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Button variant="primary" id="send_post" onClick={postAPI} >POST</Button>
               </Card.Title>
               { 
                 withdrawls !== undefined ?
