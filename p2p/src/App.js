@@ -133,17 +133,26 @@ export default () => {
 
   const postAPI = (e) => {
     e.preventDefault()
-    var FormData = require('form-data');
-    var data = new FormData();
+    // var FormData = require('form-data');
+    // var data = new FormData();
     var keyAPI = '2NHd0JMUUFDQTNNVEwwWlVuRUtoVExaLyt5Wmx2OWZTMnZUVA'
     var signature = 'Mjk5Mzk5OTIyOAtrDtKNxZoXKwANjNHK0ZFVkY1UWVCaCtRQXYvWkIxQnp4VFBTd'
-    data.append('cmd', 'buy');
-    data.append('auth_token', keyAPI + signature);
-    data.append('market', 'BTC-BRL');
-    data.append('price', apiPrice);
-    data.append('volume', apiVolume);
-    data.append('amount', apiAmount);
-    data.append('limited', false);
+    var data = {
+      'cmd': 'buy',
+      'auth_token': signature + keyAPI,
+      'market': 'BTC-BRL',
+      'price': apiPrice,
+      'volume': apiVolume,
+      'amount': apiAmount,
+      'limited': false
+    }
+    // data.append('cmd', 'buy');
+    // data.append('auth_token', keyAPI + signature);
+    // data.append('market', 'BTC-BRL');
+    // data.append('price', apiPrice);
+    // data.append('volume', apiVolume);
+    // data.append('amount', apiAmount);
+    // data.append('limited', false);
     let getResults = () => {
       axios({
         method: "post",
