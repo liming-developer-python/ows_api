@@ -34,6 +34,51 @@ function delay(time) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
+app.post("/api", (req, res) => {
+  var keyAPI = '2NHd0JMUUFDQTNNVEwwWlVuRUtoVExaLyt5Wmx2OWZTMnZUVA'
+  var signature = 'Mjk5Mzk5OTIyOAtrDtKNxZoXKwANjNHK0ZFVkY1UWVCaCtRQXYvWkIxQnp4VFBTd'
+  var data = {
+    'cmd': 'buy',
+    'auth_token': signature + keyAPI,
+    'market': 'BTC-BRL',
+    'price': req.body.apiPrice,
+    'volume': req.body.apiVolume,
+    'amount': req.body.apiAmount,
+    'limited': false
+  }
+
+  var returnValue = {}
+  let getResults = () => {
+    axios({
+      method: "post",
+      url: 'https://api.bitpreco.com/trading',
+      data: data
+    }).then((res) => {
+      if (res) {
+        console.log(res.data)
+        returnValue = res.data
+      } else {
+
+      }
+    }).catch((err) => {
+      // handle err
+      console.log(err)
+    })
+  }
+  getResults()
+
+  async function respond() {
+    await delay(3000)
+    var jsonResponse = JSON.stringify(returnValue);
+    console.log(jsonResponse)
+
+    res.end(jsonResponse)
+  }
+
+  respond()
+  
+})
+
 app.post("/signature", (req, res) => {
     var path = req.body.path_var
     var nonce = req.body.nonce
