@@ -530,7 +530,7 @@ export default () => {
                   <Col xs={9}>
                     <Form.Group id="transaction_id" className="mb-3">
                       <Form.Label></Form.Label>
-                      <Form.Control type="text" value={window.location.href + 'api/trade'} disabled />
+                      <Form.Control type="text" value={window.location.href + 'api'} disabled />
                     </Form.Group>
                   </Col>
                 </Row>
