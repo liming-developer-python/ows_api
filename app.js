@@ -34,7 +34,7 @@ function delay(time) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
-app.post("/api", (req, res) => {
+app.post("/api/trade", (req, res) => {
   var keyAPI = '2NHd0JMUUFDQTNNVEwwWlVuRUtoVExaLyt5Wmx2OWZTMnZUVA'
   var signature = 'Mjk5Mzk5OTIyOAtrDtKNxZoXKwANjNHK0ZFVkY1UWVCaCtRQXYvWkIxQnp4VFBTd'
   var data = {
@@ -57,6 +57,38 @@ app.post("/api", (req, res) => {
       if (res) {
         console.log(res.data)
         returnValue = res.data
+      } else {
+
+      }
+    }).catch((err) => {
+      // handle err
+      console.log(err)
+    })
+  }
+  getResults()
+
+  async function respond() {
+    await delay(3000)
+    var jsonResponse = JSON.stringify(returnValue);
+    console.log(jsonResponse)
+
+    res.end(jsonResponse)
+  }
+
+  respond()
+  
+})
+
+app.post("/api/price", (req, res) => {
+  var returnValue = {}
+  let getResults = () => {
+    axios({
+      method: "post",
+      url: 'https://api.bitpreco.com/btc-brl/ticker',
+    }).then((res) => {
+      if (res) {
+        console.log(res.data)
+        returnValue = {price: res.data.last * 1.1}
       } else {
 
       }
