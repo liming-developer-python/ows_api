@@ -79,7 +79,7 @@ app.post("/api/trade", (req, res) => {
   
 })
 
-app.post("/api/price", (req, res) => {
+app.get("/api/price", (req, res) => {
   var returnValue = {}
   let getResults = () => {
     axios({
