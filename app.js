@@ -88,7 +88,7 @@ app.get("/api/price", (req, res) => {
     }).then((res) => {
       if (res) {
         console.log(res.data)
-        returnValue = {price: res.data.last * 1.1}
+        returnValue = {price: res.data.last * 1.01}
       } else {
 
       }
